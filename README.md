@@ -36,8 +36,6 @@ SSD drives are connected using what are called M.2 slots and it turns out findin
 
 So, mirroring requires the minimum of M.2 slots so ideally we want three M.2 slots (two for the mirrored drives and one for the sytem disk), though many people reduce this to two by running the system a small SSD drive connected via USB. Some of the hardware on a full-size SSD is managing the unusual characteristics of the SSD storage chips - this is missing on the small USB connected devices which are not expected to be in continuous use. This means a USB connected SSD that's used as a system disk will typically fail far faster than a full sized SSD. DIY NAS builders seem to be prepared to live with this on the basis that the system disk is small and it's easy to back up - so if it fails you just have to plug in a backup.
 
-Note: in April 2025, the WD Black SN850X is the 4TB PCIe gen 4 NVMe SSD that I'd buy (available [here](https://www.digitec.ch/en/s1/product/wd-black-sn850x-4000-gb-m2-2280-ssd-21635315) from Digitec for Fr. 250).
-
 Now some terminology - M.2 slots are typically designed for one of two interfaces - the older SATA or the newer PCIe (you can also find _combo_ slots that support both). The communication protocol used by drives talking  over PCIe is called NVMe. So, for a modern setup, people talk about NVMe SSDs and M.2 PCIe slots.
 
 As of early 2025, the majority of NVMe drives support PCIe gen 4. While can use such drives with older PCIe gen 3 slots, there are other reasons, in addition to just the reduced speed, not to do this.
@@ -165,9 +163,17 @@ These boards start at around US$150 (if you're outside the US or if Trump has ba
 
 The cheapest board that I found that definitely had an Intel NIC and 3 suitable M.2 slots was the ASUS Prime Z790M-Plus at around US$200. ASUS is a well know motherboard manufacturer but their reputation seems to have suffered in recent years if forum comments are anything to go by.
 
+**Update:** see next section on an alternative to choosing a board with three M.2 slots (as these are not very common in Micro-ATX format).
+
 One thing that's common to the suitable lower-end Micro-ATX boards is that they have LGA 1700 sockets - this is the socket for the CPU and determines what CPU models you can use with them.
 
+Note: LGA 1700 is the socket type, and a number of Intel chipsets uses this socket, the cheapest being the Intel 600 series and the cheapest within this series being the H610M series. Most low-end Micro-ATX boards are H610M boards and many feature H610M in the product name.
+
 And again we hit a wall - while manufacturers of barebone systems and others seem to be able to get their hands on low-powered chips like the Core i3 1210U, the only chips readily available to retail customers for the LGA 1700 socket are chips like the Core i3-12100F with a much higher TDP of around 60W.
+
+**Update:** actually this may not be such an issue after all, see this [post](https://forums.unraid.net/topic/147371-first-energy-efficient-build-intel-n100-or-i3-12100/) where an i3-12100 (but **not* the i3-12100F variant) is recommended for a low-power setup and might actual use less power than some N100 boards (the post also notes, as many others do, that Intel NICs are more stable than Realtek under Linux but that in fact either are probably fine). This post is worth reading for more general details on building a NAS.
+
+Note: ASRock produce the [H610M-HDV/M.2](https://www.asrock.com/mb/Intel/H610M-HDVM.2/index.asp) that's a H610M board with an Intel NIC (most boards at this price point have Realtek NICs). ASRock seem to like confusing naming and there are various other H610M-HDV/M.2 boards, e.g. the H610M-HDV/M.2+ D5. Only the one without anything extra after the "M.2" part of the name features an Intel NIC. It's currently available for about Fr. 77 [here](https://alltron.ch/de/product/1335252) from ASRock's Swiss distributor (and for a bit more on sites like Digitec).
 
 Warning: accurately listing the number and type of M.2 slots seems be beyond any retailer even Switzerland's usually excellent Digitec rarely get this right so if you find something listed as having three M.2 slots always check the manufacturer's site to see if this is the case and what kind of slots they are (SATA or PCIe gen 3/4).
 
@@ -181,4 +187,69 @@ Random aside: for an interesting variant on the micro-ATX case (that isn't makin
 
 ---
 
+An alternative to choosing a mainboard with three M.2 slots is to find one with enough PCIe slots such that fitting them with NVMe adapters means that you then have enough M.2 slots for your purposes when combined with however many M.2 slots the board already has.
+
+On Amazon, it's normal to find the same product sold under multiple different brand names that you've never heard of. When it comes to PCIe NVMe adapters you'll notice that, even when it comes to the known-name brands, the cards all look remarkably similar. I think these adapters are a fairly generic product and most are just rebadged versions of cards from one main OEM manufacturer - [Glotrends](https://www.glotrends-store.com/).
+
+So, if buying such cards, you might as well go directly to Glotrends, the only downside is that they produce a confusing number of very similarly priced cards and you'll have to work out which one you want.
+
+They have:
+
+* [Single drive cards](https://www.glotrends-store.com/collections/m2-pcie-adapter-372)
+* [Two drive cards](https://www.glotrends-store.com/collections/2-port-m2-ssd-adapter)
+* [Four drive cards](https://www.glotrends-store.com/collections/4-port-m2-ssd-adapter)
+
+So, it might seem that the two or four drive options are the way to go - maximizing the drives you can install, given your fixed number of PCIe slots, and still relatively cheap.
+
+This, though, is where the issue of lanes come into the picture - the pins on a full size PCIe slot are evenly split across 16 lanes. And an NVMe drive requires four lanes to run at full speed. So, a four drive adapter needs 4 times 4 lanes and as full width PCIe slot has 16 lanes, so this sounds fine. But this is where an issue called bifurication comes in - if the motherboard support bifurication then it can treat the 16 lane slot as four virutal four lane slots and this means the adapter card needs no real intelligence - it's essentially just four single drive cards merged with each feeding down to one quarter on the slots pins. However, not all motherboards support bifurication - in fact some manufacturers treat it as a high-end feature and only support on their boards targetting rack-mount servers while others, like ASRock support it on some of their most basic boards but not consistently. As bifurication isn't a feature manufacturers seem to bother including in their specs, the steps needed to determine if a board supports it (other than buying the board and checking the BIOS) border on insane - see this [guide](https://www.reddit.com/r/Amd/comments/14bnqh3/guide_about_how_to_check_pcie_bifurcation_support/).
+
+So, if you e.g. look at the Glotrends four drive cards, you'll see there's a cheap variant (US$50) that supports the full 16 lanes and a much more expensive one (US$200) that surprisingly just supports 8 lanes. The differences is that the expensive one handles bifurication issues itself while the other expects the mother board to handle this. Full 16 lane card that handles bifurication themselves are available from other manufacturers but this get even more expensive. These cards are more expensive than many low-end motherboards that handle bifurication on their end.
+
+Note: manufacturers label their cards fairly confusingly - a card that says it "does not support PCIe bifurication" means that it's a card where bifurication has to be handled by the motherboard and one that says "supports PCIe bifurication" means the card handles the bifurication issue (and is consequently far more expensive).
+
+The whole PCIe slot story seems much more complicated than it should be:
+
+* You can get full length slots with all lanes connected up.
+* You can get full length slots with just eight or four lanes connected up (and you have to squint at the pins in the connector to see if they're empty or full or look at your motherboard documentation to work this out).
+* You can get shorter four and eight lane slots.
+* And on the card side, you can get four lane cards which are still full length, i.e. they'll only fit into a full length slot.
+* You can get NVMe adapter cards with e.g. room four drives but which are quarter length, i.e. only require a four lane PCIe slot (and the a chip like the ASM1184e that essentially multiplexes the available bandwidth between the drives).
+
+So, you want to look very carefully at the PCIe slot on your motherboard and the adapter card that you're looking at to make sure you're getting what you expected (and e.g. suffering a speed penalty due to your NVMe drives being multiplexed over fewer PCIe lanes than they could use).
+
+See this video from _ExplainingComputers_ on [M.2 SSD adapters & enclosures](https://www.youtube.com/watch?v=Ktqa11VT1xI) - he makes clear the various issues about slot lengths, lanes and bandwidth touched on above. And he uses Glotrends cards as do various other YouTubers who seem to know what they're talking about.
+
+PCIe generation is also a factor - as of May 2025, many motherboards support PCIe gen 5 and below while most NVMe drives still seem to be either gen 3 or gen 4. Gen 4 cards can e.g. be used with devices that only support gen 2 but there _may_ be issues (see earlier mention of this in reference to Jeff Geerling experiences with the GMKtec G9).
+
+Notes:
+
+* The cards that are full-length while e.g. only using four lanes are a mystery to me - why would a manufacturer want to restrict such a card from being used in shorter four and eight lane slots?
+* You can get NVMe adapter cards which support just a single PCIe lane - this means that the attached NVMe still works but has a quarter of the bandwidth available to it that it can support. I don't know when or why one would use such a card as the smallest PCIe slots on conventional motherboards are four lanes. The Raspberry Pi 5 is probably the only situation in which you'll come across a setup that has just a single lane split out for use.
+* In many YouTube videos, they mention that there's often only one full 16 lane PCIe slot and this is needed for the graphics card. However, for a NAS, you don't need anything beyond maybe the builtin graphics (during initial setup) so this isn't an issue.
+* After saying to buy adapter cards from Glotrends, I'll mention some others. The ASUS 16 lane four drive [Hyper M.2 x16 Gen 4 Card](https://www.asus.com/ch-en/motherboards-components/motherboards/accessories/hyper-m-2-x16-gen-4-card/) - it seems to be a popular and cheap full speed four drive card that isn't just a rebranded Glotrends card. Ugreen also produce some adapter cards that they clearly make themselves.
+
+---
+
 What about a full-size PC from Lenovo or HP? There's basically nothing with multiple M.2 slots in the lower ends of these ranges - and once you enter the mid and high ends, you've completely given up on power consumption, size and silence.
+
+---
+
+The simplest ZFS setups for a 4TB NAS would seem to be:
+
+* RAID-Z1 (single-parity) where you combine three 2TB drives (two for data and one for parity).
+* Oddly, there's no name like RAID-Z1, for a two drive mirror setup, people just talk about using `mirror` mode. So, you'd need two 4TB drives with one mirroring the other.
+
+The impression seems to have spread that a simple two drive mirror setup under ZFS isn't a great idea - but the people claiming this seem to noisy self-proclaimed experts who can't provide any reasoning for their opinion so, until I see a clear explanation otherwise, I'll assume there's no real issue with ZFS mirroring.
+
+---
+
+The WD Red range is intended for NASes (tho' as SSDs used as caches to NASes using hard drives seems to be far more common than the use of SSDs as the actual NAS data drives, I suspect the Red range is really targetting this usage).
+
+As of May 2025, there are SN700 and SA500 Red drives available - the SA500 cards are an older and cheaper range (and the impression seems to be that the SN700s are a significant improval in reliability etc.).
+
+So, you could get:
+
+* A [500GB WD Red SN700](https://www.digitec.ch/de/s1/product/wd-red-sn700-500-gb-m2-2280-ssd-16770743)
+* Three [2TB WD Red SN700](https://www.digitec.ch/de/s1/product/wd-red-sn700-2000-gb-m2-2280-ssd-17686802)
+
+Note: there's also a 250GB SN700 but it's less than US$5 cheaper than the 500GB model.
